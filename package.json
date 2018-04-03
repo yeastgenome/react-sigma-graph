@@ -4,10 +4,12 @@
   "description": "A react component to simple make sigma graph visualizations.",
   "main": "build/index.js",
   "peerDependencies": {
-    "react": "^15.5.4"
+    "react": "^16.3.0"
   },
   "dependencies": {
-    "react": "^15.5.4",
+  	"d3": "v3.5.17",
+    "react": "^16.3.0",
+    "sigma": "1.2.1",
     "webpack": "^2.6.1"
   },
   "scripts": {
