@@ -267,7 +267,7 @@ class ReactSigmaGraph extends React.Component {
     return (
       <div id='rGraphTarget' >
         {this.renderHeader()}
-        <div id={TARGET_ID} style={{ height: this.getHeight() }} />
+        <div id={TARGET_ID} style={{ maxWidth: this.getHeight(), height: this.getHeight() }} />
         {this.renderFooter()}
       </div>
     );
@@ -316,4 +316,3 @@ function debounce(func, wait, immediate) {
     if (callNow) func.apply(context, args);
   };
 };
-
