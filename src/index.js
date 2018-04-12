@@ -267,7 +267,9 @@ class ReactSigmaGraph extends React.Component {
     return (
       <div id='rGraphTarget' >
         {this.renderHeader()}
-        <div id={TARGET_ID} style={{ maxWidth: this.getHeight(), height: this.getHeight() }} />
+        <div style={{ position: 'relative' }}>
+          <div id={TARGET_ID} style={{ maxWidth: this.getHeight(), height: this.getHeight() }} />
+        </div>
         {this.renderFooter()}
       </div>
     );

@@ -22255,7 +22255,11 @@ var ReactSigmaGraph = function (_React$Component) {
         'div',
         { id: 'rGraphTarget' },
         this.renderHeader(),
-        _react2.default.createElement('div', { id: TARGET_ID, style: { maxWidth: this.getHeight(), height: this.getHeight() } }),
+        _react2.default.createElement(
+          'div',
+          { style: { position: 'relative' } },
+          _react2.default.createElement('div', { id: TARGET_ID, style: { maxWidth: this.getHeight(), height: this.getHeight() } })
+        ),
         this.renderFooter()
       );
     }
