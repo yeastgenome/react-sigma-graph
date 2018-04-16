@@ -22008,6 +22008,24 @@ var ReactSigmaGraph = function (_React$Component) {
       return this.props.data || DEFAULT_DATA;
     }
   }, {
+    key: 'getColorScale',
+    value: function getColorScale() {
+      var data = this.getData();
+      // get unique categorys
+      var domain = void 0;
+      if (this.props.categoryColors) {
+        domain = Object.keys(this.props.categoryColors);
+      } else {
+        var keys = data.nodes.map(function (d) {
+          return d.category;
+        });
+        domain = keys.filter(function (x, i, a) {
+          return a.indexOf(x) == i;
+        });
+      }
+      return _d3.default.scale.category10().domain(domain);
+    }
+  }, {
     key: 'getHeight',
     value: function getHeight() {
       return MAX_HEIGHT;
@@ -22058,7 +22076,7 @@ var ReactSigmaGraph = function (_React$Component) {
     key: 'getNodes',
     value: function getNodes() {
       var defaultColorScale = DEFAULT_COLOR_SCALE;
-      var colorScale = this.props.colorScale || defaultColorScale;
+      var colorScale = this.getColorScale();
       // only get state.currentMaxNodes
       var maxNodes = this.state.currentMaxNodes || DEFAULT_MAX_VALUE;
       return this.getData().nodes.slice(0, maxNodes).map(function (d) {
@@ -22178,7 +22196,7 @@ var ReactSigmaGraph = function (_React$Component) {
     key: 'renderHeader',
     value: function renderHeader() {
       var NODE_SIZE = '0.8rem';
-      var cScale = this.props.colorScale || DEFAULT_COLOR_SCALE;
+      var cScale = this.getColorScale();
       var nodes = cScale.domain().map(function (d, i) {
         var thisBg = cScale(d);
         return _react2.default.createElement(
