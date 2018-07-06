@@ -21928,6 +21928,16 @@ var _plugins = __webpack_require__(1);
 
 var _plugins2 = _interopRequireDefault(_plugins);
 
+__webpack_require__(9);
+
+__webpack_require__(5);
+
+__webpack_require__(6);
+
+__webpack_require__(7);
+
+__webpack_require__(8);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -22160,6 +22170,7 @@ var ReactSigmaGraph = function (_React$Component) {
         }],
         settings: (_settings = {
           animationsTime: TRANSITION_DURATION,
+          edgeLabelSize: 'proportional',
           labelThreshold: 100,
           minNodeSize: 7,
           maxNodeSize: 7,
@@ -22308,7 +22319,7 @@ var EDGE_COLOR = '#e2e2e2';
 var HIGHLIGHTED_EDGE_COLOR = '#808080';
 var SIZE_DEBOUNCE = 1000;
 var DEFAULT_COLOR_SCALE = _d3.default.scale.category10();
-var DEFAULT_DATA = { nodes: [{ id: 'a', category: 'cat', name: 'Garfield' }, { id: 'b', category: 'dog', name: 'Pluto' }], edges: [{ source: 'a', target: 'b' }] };
+var DEFAULT_DATA = { nodes: [{ id: 'a', category: 'cat', name: 'Garfield' }, { id: 'b', category: 'dog', name: 'Pluto' }], edges: [{ source: 'a', target: 'b', label: 'friend' }] };
 
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for
@@ -22330,6 +22341,387 @@ function debounce(func, wait, immediate) {
     if (callNow) func.apply(context, args);
   };
 };
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _sigma = __webpack_require__(0);
+
+var _sigma2 = _interopRequireDefault(_sigma);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+;(function (undefined) {
+  'use strict';
+
+  if (typeof _sigma2.default === 'undefined') throw 'sigma is not declared';
+
+  // Initialize packages:
+  _sigma2.default.utils.pkg('sigma.canvas.edges.labels');
+
+  /**
+   * This label renderer will just display the label on the curve of the edge.
+   * The label is rendered at half distance of the edge extremities, and is
+   * always oriented from left to right on the top side of the curve.
+   *
+   * @param  {object}                   edge         The edge object.
+   * @param  {object}                   source node  The edge source node.
+   * @param  {object}                   target node  The edge target node.
+   * @param  {CanvasRenderingContext2D} context      The canvas context.
+   * @param  {configurable}             settings     The settings function.
+   */
+  _sigma2.default.canvas.edges.labels.curve = function (edge, source, target, context, settings) {
+    if (typeof edge.label !== 'string') return;
+
+    var prefix = settings('prefix') || '',
+        size = edge[prefix + 'size'] || 1;
+
+    if (size < settings('edgeLabelThreshold')) return;
+
+    var fontSize,
+        sSize = source[prefix + 'size'],
+        sX = source[prefix + 'x'],
+        sY = source[prefix + 'y'],
+        tX = target[prefix + 'x'],
+        tY = target[prefix + 'y'],
+        count = edge.count || 0,
+        dX = tX - sX,
+        dY = tY - sY,
+        sign = sX < tX ? 1 : -1,
+        cp = {},
+        c,
+        angle,
+        t = 0.5; //length of the curve
+
+    if (source.id === target.id) {
+      cp = _sigma2.default.utils.getSelfLoopControlPoints(sX, sY, sSize, count);
+      c = _sigma2.default.utils.getPointOnBezierCurve(t, sX, sY, tX, tY, cp.x1, cp.y1, cp.x2, cp.y2);
+      angle = Math.atan2(1, 1); // 45°
+    } else {
+      cp = _sigma2.default.utils.getQuadraticControlPoint(sX, sY, tX, tY, count);
+      c = _sigma2.default.utils.getPointOnQuadraticCurve(t, sX, sY, tX, tY, cp.x, cp.y);
+      angle = Math.atan2(dY * sign, dX * sign);
+    }
+
+    // The font size is sublineraly proportional to the edge size, in order to
+    // avoid very large labels on screen.
+    // This is achieved by f(x) = x * x^(-1/ a), where 'x' is the size and 'a'
+    // is the edgeLabelSizePowRatio. Notice that f(1) = 1.
+    // The final form is:
+    // f'(x) = b * x * x^(-1 / a), thus f'(1) = b. Application:
+    // fontSize = defaultEdgeLabelSize if edgeLabelSizePowRatio = 1
+    fontSize = settings('edgeLabelSize') === 'fixed' ? settings('defaultEdgeLabelSize') : settings('defaultEdgeLabelSize') * size * Math.pow(size, -1 / settings('edgeLabelSizePowRatio'));
+
+    context.save();
+
+    if (edge.active) {
+      context.font = [settings('activeFontStyle'), fontSize + 'px', settings('activeFont') || settings('font')].join(' ');
+
+      context.fillStyle = settings('edgeActiveColor') === 'edge' ? edge.active_color || settings('defaultEdgeActiveColor') : settings('defaultEdgeLabelActiveColor');
+    } else {
+      context.font = [settings('fontStyle'), fontSize + 'px', settings('font')].join(' ');
+
+      context.fillStyle = settings('edgeLabelColor') === 'edge' ? edge.color || settings('defaultEdgeColor') : settings('defaultEdgeLabelColor');
+    }
+
+    context.textAlign = 'center';
+    context.textBaseline = 'alphabetic';
+
+    context.translate(c.x, c.y);
+    context.rotate(angle);
+    context.fillText(edge.label, 0, -size / 2 - 3);
+
+    context.restore();
+  };
+}).call(undefined);
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _sigma = __webpack_require__(0);
+
+var _sigma2 = _interopRequireDefault(_sigma);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+;(function (undefined) {
+  'use strict';
+
+  if (typeof _sigma2.default === 'undefined') throw 'sigma is not declared';
+
+  // Initialize packages:
+  _sigma2.default.utils.pkg('sigma.canvas.edges.labels');
+
+  /**
+   * This label renderer will just display the label on the curve of the edge.
+   * The label is rendered at half distance of the edge extremities, and is
+   * always oriented from left to right on the top side of the curve.
+   *
+   * @param  {object}                   edge         The edge object.
+   * @param  {object}                   source node  The edge source node.
+   * @param  {object}                   target node  The edge target node.
+   * @param  {CanvasRenderingContext2D} context      The canvas context.
+   * @param  {configurable}             settings     The settings function.
+   */
+  _sigma2.default.canvas.edges.labels.curvedArrow = function (edge, source, target, context, settings) {
+    _sigma2.default.canvas.edges.labels.curve(edge, source, target, context, settings);
+  };
+}).call(undefined);
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _sigma = __webpack_require__(0);
+
+var _sigma2 = _interopRequireDefault(_sigma);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+;(function (undefined) {
+  'use strict';
+
+  if (typeof _sigma2.default === 'undefined') throw 'sigma is not declared';
+
+  // Initialize packages:
+  _sigma2.default.utils.pkg('sigma.canvas.edges.labels');
+
+  /**
+   * This label renderer will just display the label on the line of the edge.
+   * The label is rendered at half distance of the edge extremities, and is
+   * always oriented from left to right on the top side of the line.
+   *
+   * @param  {object}                   edge         The edge object.
+   * @param  {object}                   source node  The edge source node.
+   * @param  {object}                   target node  The edge target node.
+   * @param  {CanvasRenderingContext2D} context      The canvas context.
+   * @param  {configurable}             settings     The settings function.
+   */
+  _sigma2.default.canvas.edges.labels.def = function (edge, source, target, context, settings) {
+    if (typeof edge.label !== 'string' || source == target) return;
+
+    var prefix = settings('prefix') || '',
+        size = edge[prefix + 'size'] || 1;
+
+    if (size < settings('edgeLabelThreshold')) return;
+
+    if (0 === settings('edgeLabelSizePowRatio')) throw '"edgeLabelSizePowRatio" must not be 0.';
+
+    var fontSize,
+        x = (source[prefix + 'x'] + target[prefix + 'x']) / 2,
+        y = (source[prefix + 'y'] + target[prefix + 'y']) / 2,
+        dX = target[prefix + 'x'] - source[prefix + 'x'],
+        dY = target[prefix + 'y'] - source[prefix + 'y'],
+        sign = source[prefix + 'x'] < target[prefix + 'x'] ? 1 : -1,
+        angle = Math.atan2(dY * sign, dX * sign);
+
+    // The font size is sublineraly proportional to the edge size, in order to
+    // avoid very large labels on screen.
+    // This is achieved by f(x) = x * x^(-1/ a), where 'x' is the size and 'a'
+    // is the edgeLabelSizePowRatio. Notice that f(1) = 1.
+    // The final form is:
+    // f'(x) = b * x * x^(-1 / a), thus f'(1) = b. Application:
+    // fontSize = defaultEdgeLabelSize if edgeLabelSizePowRatio = 1
+    fontSize = settings('edgeLabelSize') === 'fixed' ? settings('defaultEdgeLabelSize') : settings('defaultEdgeLabelSize') * size * Math.pow(size, -1 / settings('edgeLabelSizePowRatio'));
+
+    context.save();
+
+    if (edge.active) {
+      context.font = [settings('activeFontStyle'), fontSize + 'px', settings('activeFont') || settings('font')].join(' ');
+
+      context.fillStyle = settings('edgeActiveColor') === 'edge' ? edge.active_color || settings('defaultEdgeActiveColor') : settings('defaultEdgeLabelActiveColor');
+    } else {
+      context.font = [settings('fontStyle'), fontSize + 'px', settings('font')].join(' ');
+
+      context.fillStyle = settings('edgeLabelColor') === 'edge' ? edge.color || settings('defaultEdgeColor') : settings('defaultEdgeLabelColor');
+    }
+
+    context.textAlign = 'center';
+    context.textBaseline = 'alphabetic';
+
+    context.translate(x, y);
+    context.rotate(angle);
+    context.fillText(edge.label, 0, -size / 2 - 3);
+
+    context.restore();
+  };
+}).call(undefined);
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _sigma = __webpack_require__(0);
+
+var _sigma2 = _interopRequireDefault(_sigma);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+; // https://raw.githubusercontent.com/jacomyal/sigma.js/master/plugins/sigma.renderers.edgeLabels/settings.js
+(function (undefined) {
+  'use strict';
+
+  if (typeof _sigma2.default === 'undefined') throw 'sigma is not declared';
+
+  // Initialize package:
+  _sigma2.default.utils.pkg('sigma.settings');
+
+  /**
+  * Extended sigma settings for sigma.renderers.edgeLabels.
+  */
+  var settings = {
+    /**
+     * RENDERERS SETTINGS:
+     * *******************
+     */
+    // {string}
+    defaultEdgeLabelColor: '#000',
+    // {string}
+    defaultEdgeLabelActiveColor: '#000',
+    // {string}
+    defaultEdgeLabelSize: 10,
+    // {string} Indicates how to choose the edge labels size. Available values:
+    //          "fixed", "proportional"
+    edgeLabelSize: 'fixed',
+    // {string} The opposite power ratio between the font size of the label and
+    // the edge size:
+    // Math.pow(size, -1 / edgeLabelSizePowRatio) * size * defaultEdgeLabelSize
+    edgeLabelSizePowRatio: 1,
+    // {number} The minimum size an edge must have to see its label displayed.
+    edgeLabelThreshold: 1
+  };
+
+  // Export the previously designed settings:
+  _sigma2.default.settings = _sigma2.default.utils.extend(_sigma2.default.settings || {}, settings);
+
+  // Override default settings:
+  _sigma2.default.settings.drawEdgeLabels = true;
+}).call(undefined);
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _sigma = __webpack_require__(0);
+
+var _sigma2 = _interopRequireDefault(_sigma);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+;(function (undefined) {
+
+  /**
+   * Sigma Renderer Snapshot Utility
+   * ================================
+   *
+   * The aim of this plugin is to enable users to retrieve a static image
+   * of the graph being rendered.
+   *
+   * Author: Guillaume Plique (Yomguithereal)
+   * Version: 0.0.1
+   * A few local edits were made by Travis Sheppard, remove delete variables to avoid strict mode error. 
+   */
+
+  // Terminating if sigma were not to be found
+  if (typeof _sigma2.default === 'undefined') throw 'sigma.renderers.snapshot: sigma not in scope.';
+
+  // Constants
+  var CONTEXTS = ['scene', 'edges', 'nodes', 'labels'],
+      TYPES = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    gif: 'image/gif',
+    tiff: 'image/tiff'
+  };
+
+  // Utilities
+  function download(dataUrl, extension, filename) {
+
+    // Anchor
+    var anchor = document.createElement('a');
+    anchor.setAttribute('href', dataUrl);
+    anchor.setAttribute('download', filename || 'graph.' + extension);
+
+    // Click event
+    var event = document.createEvent('MouseEvent');
+    event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+    anchor.dispatchEvent(event);
+  }
+
+  // Main function
+  function snapshot(params) {
+    params = params || {};
+
+    // Enforcing
+    if (params.format && !(params.format in TYPES)) throw Error('sigma.renderers.snaphot: unsupported format "' + params.format + '".');
+
+    var self = this,
+        webgl = this instanceof _sigma2.default.renderers.webgl,
+        doneContexts = [];
+
+    // Creating a false canvas where we'll merge the other
+    var merged = document.createElement('canvas'),
+        mergedContext = merged.getContext('2d'),
+        sized = false;
+
+    // Iterating through context
+    CONTEXTS.forEach(function (name) {
+      if (!self.contexts[name]) return;
+
+      if (params.labels === false && name === 'labels') return;
+
+      var canvas = self.domElements[name] || self.domElements['scene'],
+          context = self.contexts[name];
+
+      if (~doneContexts.indexOf(context)) return;
+
+      if (!sized) {
+        merged.width = webgl && context instanceof WebGLRenderingContext ? canvas.width / 2 : canvas.width;
+        merged.height = webgl && context instanceof WebGLRenderingContext ? canvas.height / 2 : canvas.height;
+        sized = true;
+
+        // Do we want a background color?
+        if (params.background) {
+          mergedContext.rect(0, 0, merged.width, merged.height);
+          mergedContext.fillStyle = params.background;
+          mergedContext.fill();
+        }
+      }
+
+      if (context instanceof WebGLRenderingContext) mergedContext.drawImage(canvas, 0, 0, canvas.width / 2, canvas.height / 2);else mergedContext.drawImage(canvas, 0, 0);
+
+      doneContexts.push(context);
+    });
+
+    var dataUrl = merged.toDataURL(TYPES[params.format || 'png']);
+
+    if (params.download) download(dataUrl, params.format || 'png', params.filename);
+
+    return dataUrl;
+  }
+
+  // Extending canvas and webl renderers
+  _sigma2.default.renderers.canvas.prototype.snapshot = snapshot;
+  _sigma2.default.renderers.webgl.prototype.snapshot = snapshot;
+}).call(undefined);
 
 /***/ })
 /******/ ]);

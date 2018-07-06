@@ -3,6 +3,11 @@ import React from 'react';
 import d3 from 'd3';
 import sigma from 'sigma';
 import animate from './vendor/plugins.animate';
+import './vendor/sigma.renderers.snapshot';
+import './vendor/edges.labels.curve';
+import './vendor/edges.labels.curvedArrow';
+import './vendor/edges.labels.def';
+import './vendor/settings';
 
 class ReactSigmaGraph extends React.Component {
   constructor(props) {
@@ -192,6 +197,7 @@ class ReactSigmaGraph extends React.Component {
       ],
       settings: {
         animationsTime: TRANSITION_DURATION,
+        edgeLabelSize: 'proportional',
         labelThreshold: 100,
         minNodeSize: 7,
         maxNodeSize: 7,
@@ -310,7 +316,7 @@ const EDGE_COLOR = '#e2e2e2';
 const HIGHLIGHTED_EDGE_COLOR = '#808080';
 const SIZE_DEBOUNCE = 1000;
 const DEFAULT_COLOR_SCALE = d3.scale.category10();
-const DEFAULT_DATA = { nodes: [{ id: 'a', category: 'cat', name: 'Garfield' }, { id: 'b', category: 'dog', name: 'Pluto' }], edges: [{ source: 'a', target: 'b' }] };
+const DEFAULT_DATA = { nodes: [{ id: 'a', category: 'cat', name: 'Garfield' }, { id: 'b', category: 'dog', name: 'Pluto' }], edges: [{ source: 'a', target: 'b', label: 'friend' }] };
 
 // Returns a function, that, as long as it continues to be invoked, will not
 // be triggered. The function will be called after it stops being called for
