@@ -2,7 +2,7 @@
   "name": "react-sigma-graph",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "A react component to simple make sigma graph visualizations.",
+  "description": "A react component to easily make sigma graph visualizations.",
   "repository": {
     "type": "git",
     "url": "https://github.com/yeastgenome/react-sigma-graph.git"
