@@ -18,12 +18,18 @@ class App extends Component {
         { id: 'a', category: 'cat', name: 'Garfield' },
         { id: 'b', category: 'dog', name: 'Pluto' }
       ],
+      // edge labels and types are optional
       edges: [
         { source: 'a', target: 'b', label: 'friend', type: 'arrow' }
       ]
     };
+    // optional color definition, defaults to d3 category10 based on dimain of categories in data
+    var _categoryColors = {
+      'cat': '#1f77b4',
+      'dog': '#ff7f0e'
+    };
     return (
-      <Graph data={_data}/>
+      <Graph data={_data} categoryColors={_categoryColors} />
     );
   }
 }
@@ -31,4 +37,3 @@ class App extends Component {
 export default App;
 ```
 
-WORK IN PROGRESS

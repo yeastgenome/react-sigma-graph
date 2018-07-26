@@ -65,15 +65,21 @@ class ReactSigmaGraph extends React.Component {
 
   getColorScale() {
     let data = this.getData();
-    // get unique categorys
-    let domain;
-    if (this.props.categoryColors) {
-      domain = Object.keys(this.props.categoryColors);
+    let catC = this.props.categoryColors;
+    if (typeof catC === 'object') {
+      function cScale(d) {
+        return catC[d] || 'black';
+      };
+      cScale.domain = function cScaleDomain() {
+        return Object.keys(catC)
+      };
+      return cScale;
     } else {
       let keys = data.nodes.map( d => d.category );
-      domain = keys.filter((x, i, a) => a.indexOf(x) == i);
+      let domain = keys.filter((x, i, a) => a.indexOf(x) == i);
+      return d3.scale.category10().domain(domain);
     }
-    return d3.scale.category10().domain(domain);
+    
   }
 
   getHeight() {
@@ -117,7 +123,6 @@ class ReactSigmaGraph extends React.Component {
   }
 
   getNodes() {
-    let defaultColorScale = DEFAULT_COLOR_SCALE;
     let colorScale = this.getColorScale();
     // only get state.currentMaxNodes
     var maxNodes = this.state.currentMaxNodes || DEFAULT_MAX_VALUE;
