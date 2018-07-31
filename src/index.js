@@ -35,7 +35,7 @@ class ReactSigmaGraph extends React.Component {
   // redirect to 'link' property of node data
   handleNodeClick(e) {
     if (!this.canClick) return;
-    let newUrl = e.data.node.link;
+    let newUrl = e.data.node.href;
     if (newUrl && window) {
       window.location.href = newUrl;
     }
