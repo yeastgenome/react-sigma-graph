@@ -22369,7 +22369,7 @@ var ReactSigmaGraph = function (_React$Component) {
     key: 'handleNodeClick',
     value: function handleNodeClick(e) {
       if (!this.canClick) return;
-      var newUrl = e.data.node.link;
+      var newUrl = e.data.node.href;
       if (newUrl && window) {
         window.location.href = newUrl;
       }
