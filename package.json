@@ -1,6 +1,6 @@
 {
   "name": "react-sigma-graph",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "description": "A react component to easily make sigma graph visualizations.",
   "repository": {
@@ -12,7 +12,7 @@
     "react": "^16.3.0"
   },
   "dependencies": {
-  	"d3": "v3.5.17",
+    "d3": "v3.5.17",
     "sigma": "1.2.1"
   },
   "scripts": {
@@ -31,6 +31,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.5.1",
+    "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^2.6.1"
   }
 }

@@ -1,10 +1,10 @@
 var path = require('path');
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
 module.exports = {
   entry: './src/index.js',
-  output: {
-    path: path.resolve(__dirname, 'build'),
-    filename: 'index.js',
-    libraryTarget: 'commonjs2' // Make as plugin.
+  externals: {
+    'react': 'commonjs react' // Use the React dependency of our parent project instead of using our own React.
   },
   module: {
     rules: [
@@ -21,7 +21,10 @@ module.exports = {
       }
     ]
   },
-  externals: {
-    'react': 'commonjs react' // Use the React dependency of our parent project instead of using our own React.
-  }
+  output: {
+    path: path.resolve(__dirname, 'build'),
+    filename: 'index.js',
+    libraryTarget: 'commonjs2' // Make as plugin.
+  },
+  plugins: [new UglifyJsPlugin()]
 };

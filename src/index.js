@@ -2,7 +2,10 @@ import React from 'react';
 
 import d3 from 'd3';
 import sigma from 'sigma';
+
+// sigma.js plugins from https://github.com/jacomyal/sigma.js/tree/master/plugins
 import animate from './vendor/plugins.animate';
+import './vendor/sigma.plugins.dragNodes';
 import './vendor/sigma.renderers.snapshot';
 import './vendor/edges.labels.curve';
 import './vendor/edges.labels.curvedArrow';
@@ -232,15 +235,15 @@ class ReactSigmaGraph extends React.Component {
       });
       this.s.refresh();
     });
-    // let dragListener = sigma.plugins.dragNodes(this.s, this.s.renderers[0]);
-    // dragListener.bind('startdrag', (e) => {
-    //   this.canClick = false;
-    // });
-    // dragListener.bind('dragend', (e) => {
-    //   setTimeout(() => {
-    //     this.canClick = true;
-    //   }, 50)
-    // });
+    let dragListener = sigma.plugins.dragNodes(this.s, this.s.renderers[0]);
+    dragListener.bind('startdrag', (e) => {
+      this.canClick = false;
+    });
+    dragListener.bind('dragend', (e) => {
+      setTimeout(() => {
+        this.canClick = true;
+      }, 50)
+    });
     this.s.bind('clickNode', (e) => {
       this.handleNodeClick(e);
     });
@@ -292,7 +295,7 @@ class ReactSigmaGraph extends React.Component {
       <div id='rGraphTarget' >
         {this.renderHeader()}
         <div style={{ position: 'relative' }}>
-          <div id={TARGET_ID} style={{ maxWidth: this.getHeight(), height: this.getHeight() }} />
+          <div id={TARGET_ID} style={{ height: this.getHeight() }} />
         </div>
         {this.renderFooter()}
       </div>
@@ -316,7 +319,7 @@ const TARGET_ID = 'j-sigma-target';
 const TRANSITION_DURATION = 1000;
 const DEFAULT_X = 0;
 const DEFAULT_Y = 0;
-const N_TICKS = 100;
+const N_TICKS = 180;
 const EDGE_COLOR = '#e2e2e2';
 const HIGHLIGHTED_EDGE_COLOR = '#808080';
 const SIZE_DEBOUNCE = 1000;
