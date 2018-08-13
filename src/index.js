@@ -20,6 +20,7 @@ class ReactSigmaGraph extends React.Component {
     this.state = {
       currentMaxValue: DEFAULT_MAX_VALUE
     };
+    this.randomIdSegment = Math.random().toString(36).substring(7);
   }
 
   componentDidMount() {
@@ -33,6 +34,10 @@ class ReactSigmaGraph extends React.Component {
     if (shouldUpdate) {
       this.drawGraph();
     }
+  }
+
+  getTargetId() {
+    return `${TARGET_ID_PREFIX}.${this.randomIdSegment}`;
   }
 
   // redirect to 'link' property of node data
@@ -51,7 +56,7 @@ class ReactSigmaGraph extends React.Component {
   }
 
   handleMaxSizeChange() {
-    let newValue = document.getElementById('rGraphSlider').value;
+    let newValue = document.getElementById(`rGraphSlider.${this.randomIdSegment}`).value;
     this.setState({ currentMaxNodes: newValue });
     this.drawGraph();
   }
@@ -199,7 +204,7 @@ class ReactSigmaGraph extends React.Component {
       graph: _graph,
       renderers: [
         {
-          container: TARGET_ID,
+          container: this.getTargetId(),
           type: 'canvas'
         }
       ],
@@ -282,7 +287,7 @@ class ReactSigmaGraph extends React.Component {
               <span>{DEFAULT_MAX_VALUE.toString()}</span>
               <span>{MAX_MAX_VALUE.toString()}</span>
             </div>
-            <input type='range' style={{ minWidth: '15rem' }} min={DEFAULT_MAX_VALUE.toString()} max={MAX_MAX_VALUE.toString()} defaultValue={DEFAULT_MAX_VALUE.toString()} id='rGraphSlider' onChange={_onChange} />
+            <input type='range' style={{ minWidth: '15rem' }} min={DEFAULT_MAX_VALUE.toString()} max={MAX_MAX_VALUE.toString()} defaultValue={DEFAULT_MAX_VALUE.toString()} id={`rGraphSlider.${this.randomIdSegment}`}onChange={_onChange} />
           </div>
           <a className='button small secondary' onClick={this.handleDownload.bind(this)}><i className='fa fa-download' /> Download (.png)</a>
         </div>
@@ -292,10 +297,10 @@ class ReactSigmaGraph extends React.Component {
 
   render() {
     return (
-      <div id='rGraphTarget' >
+      <div id={`rGraphTarget${this.randomIdSegment}`} >
         {this.renderHeader()}
         <div style={{ position: 'relative' }}>
-          <div id={TARGET_ID} style={{ height: this.getHeight() }} />
+          <div id={this.getTargetId()} style={{ height: this.getHeight() }} />
         </div>
         {this.renderFooter()}
       </div>
@@ -315,7 +320,7 @@ export default ReactSigmaGraph;
 const DEFAULT_MAX_VALUE = 50;
 const MAX_MAX_VALUE = 150;
 const MAX_HEIGHT = 600;
-const TARGET_ID = 'j-sigma-target';
+const TARGET_ID_PREFIX = 'j-sigma-target';
 const TRANSITION_DURATION = 1000;
 const DEFAULT_X = 0;
 const DEFAULT_Y = 0;
