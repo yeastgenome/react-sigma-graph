@@ -1,6 +1,6 @@
 {
   "name": "react-sigma-graph",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "MIT",
   "description": "A react component to easily make sigma graph visualizations.",
   "repository": {

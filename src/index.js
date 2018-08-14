@@ -184,14 +184,16 @@ class ReactSigmaGraph extends React.Component {
       this.s.graph.clear();
       this.s.refresh();
     } else {
-      sigma.classes.graph.addMethod('neighbors', function(nodeId) {
-      var k,
-          neighbors = {},
-          index = this.allNeighborsIndex[nodeId] || {};
-      for (k in index)
-        neighbors[k] = this.nodesIndex[k];
-      return neighbors;
-    });
+      if (!sigma.classes.graph.hasMethod('neighbors')) {
+        sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+        var k,
+            neighbors = {},
+            index = this.allNeighborsIndex[nodeId] || {};
+        for (k in index)
+          neighbors[k] = this.nodesIndex[k];
+          return neighbors;
+        });
+      }
     }
     let _nodes = this.getFormattedNodes();
     let _edges = this.getEdges();
