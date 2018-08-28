@@ -276,7 +276,7 @@ class ReactSigmaGraph extends React.Component {
     let nodes = cScale.domain().map( (d, i) => {
       let thisBg = cScale(d);
       return (
-        <span key={`hl${i}`} style={{ fontSize: '0.9rem', marginRight: '1rem', whiteSpace: 'nowrap' }}><span style={{ background: thisBg, borderRadius: '0.5rem', display: 'inline-block', height: NODE_SIZE, position: 'relative', top: '0.1rem', width: NODE_SIZE }}></span> {d}</span>
+        <span key={`hl${i}`} style={{ display: 'inline-block', fontSize: '0.9rem', marginRight: '1rem', whiteSpace: 'nowrap' }}><span style={{ background: thisBg, borderRadius: '0.5rem', display: 'inline-block', height: NODE_SIZE, position: 'relative', top: '0.1rem', width: NODE_SIZE }}></span> {d}</span>
       );
     });
     let headerText = this.props.headerText;
@@ -327,7 +327,6 @@ class ReactSigmaGraph extends React.Component {
   }
 
   renderFooter() {
-    
     return (
       <div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
