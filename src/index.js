@@ -15,10 +15,15 @@ import './vendor/settings';
 class ReactSigmaGraph extends React.Component {
   constructor(props) {
     super(props);
+    let defaultFilterKey = null;
+    if (props.filters) {
+      defaultFilterKey = Object.keys(props.filters)[0];
+    }
     this.lastNodes = [];
     this.canClick = true;
     this.state = {
-      currentMaxValue: DEFAULT_MAX_VALUE
+      currentMaxValue: DEFAULT_MAX_VALUE,
+      currentFilter: defaultFilterKey
     };
     this.randomIdSegment = Math.random().toString(36).substring(7);
   }
@@ -27,10 +32,13 @@ class ReactSigmaGraph extends React.Component {
     this.drawGraph();
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps, prevState) {
     // see if stage changed
     let hasStage = typeof this.props.stage !== 'undefined';
     let shouldUpdate = hasStage ? (prevProps.stage !== this.props.stage) : this.didDataChange(prevProps.data, this.getData());
+    if (this.state !== prevState) {
+      shouldUpdate = true;
+    }
     if (shouldUpdate) {
       this.drawGraph();
     }
@@ -98,13 +106,13 @@ class ReactSigmaGraph extends React.Component {
   getFormattedLinks() {
     let nodes = this.getData().nodes;
     let edges = this.getEdges();
-    function findIndexOfNodeById(id) {
-      let thisNode = nodes.filter( d => d.id === id )[0];
-      return nodes.indexOf(thisNode);
-    }
+    let nodesIdsObj = nodes.reduce( (ac, next, i) => {
+      ac[next.id] = i;
+      return ac;
+    }, {});
     return edges.map( d => {
-      let sourceIndex = findIndexOfNodeById(d.source);
-      let targetIndex = findIndexOfNodeById(d.target);
+      let sourceIndex = nodesIdsObj[d.source];
+      let targetIndex = nodesIdsObj[d.target];
       return { source: sourceIndex, target: targetIndex };
     });
   }
@@ -113,13 +121,13 @@ class ReactSigmaGraph extends React.Component {
     let data = this.getData();
     let rawEdges = data.edges;
     let nodes = this.getNodes();
+    let nodesIdsObj = nodes.reduce( (ac, next, i) => {
+      ac[next.id] = i;
+      return ac;
+    }, {});
     let filteredEdges = rawEdges.filter( (d) => {
-      let hasSource = nodes.filter( (_d) => {
-        return (_d.id === d.source);
-      }).length;
-      let hasTarget = nodes.filter( (_d) => {
-        return (_d.id === d.target);
-      }).length;
+      let hasSource = nodesIdsObj.hasOwnProperty(d.source);
+      let hasTarget = nodesIdsObj.hasOwnProperty(d.target);
       return (hasSource && hasTarget);
     });
     return filteredEdges.map( (d, i) => {
@@ -134,7 +142,13 @@ class ReactSigmaGraph extends React.Component {
     let colorScale = this.getColorScale();
     // only get state.currentMaxNodes
     var maxNodes = this.state.currentMaxNodes || DEFAULT_MAX_VALUE;
-    return this.getData().nodes.slice(0, maxNodes).map( (d) => {
+    let nodes;
+    if (this.state.currentFilter) {
+      nodes =  this.getData().nodes.filter(this.props.filters[this.state.currentFilter]);
+    } else {
+      nodes = this.getData().nodes.slice(0, maxNodes);
+    }
+    return nodes.slice(0, maxNodes).map( (d) => {
       d.color = colorScale(d.category);
       d.label = d.name;
       d.size = d.direct ? 1 : 0.5;
@@ -262,7 +276,7 @@ class ReactSigmaGraph extends React.Component {
     let nodes = cScale.domain().map( (d, i) => {
       let thisBg = cScale(d);
       return (
-        <span key={`hl${i}`} style={{ fontSize: '0.9rem', marginRight: '1rem' }}><span style={{ background: thisBg, borderRadius: '0.5rem', display: 'inline-block', height: NODE_SIZE, position: 'relative', top: '0.1rem', width: NODE_SIZE }}></span> {d}</span>
+        <span key={`hl${i}`} style={{ fontSize: '0.9rem', marginRight: '1rem', whiteSpace: 'nowrap' }}><span style={{ background: thisBg, borderRadius: '0.5rem', display: 'inline-block', height: NODE_SIZE, position: 'relative', top: '0.1rem', width: NODE_SIZE }}></span> {d}</span>
       );
     });
     let headerText = this.props.headerText;
@@ -271,26 +285,53 @@ class ReactSigmaGraph extends React.Component {
         <div>
           {nodes}
         </div>
-        <div>
+        <div style={{ whiteSpace: 'nowrap' }}>
           {headerText}
         </div>
       </div>
     );
   }
 
-  renderFooter() {
+  renderFilter() {
+    if (this.props.hideFilter) {
+      return null;
+    }
+    if (this.props.filters) {
+      let radioNodes = Object.keys(this.props.filters).map( d => {
+        let _checked = (d === this.state.currentFilter);
+        let _onChange = e => this.setState({ currentFilter: d });
+        return (
+          <label key={d}>
+            <input checked={_checked} onChange={_onChange} type='radio' value={d} />
+            {d}
+          </label>
+        );
+      });
+      return (
+        <form>
+          {radioNodes}
+        </form>
+      );
+    }
     let _onChange = debounce(this.handleMaxSizeChange, SIZE_DEBOUNCE).bind(this);
     return (
       <div>
+        <label>Maximum Number of Nodes</label>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>{DEFAULT_MAX_VALUE.toString()}</span>
+          <span>{MAX_MAX_VALUE.toString()}</span>
+        </div>
+        <input type='range' style={{ minWidth: '15rem' }} min={DEFAULT_MAX_VALUE.toString()} max={MAX_MAX_VALUE.toString()} defaultValue={DEFAULT_MAX_VALUE.toString()} id={`rGraphSlider.${this.randomIdSegment}`} onChange={_onChange} />
+      </div>
+    ); 
+  }
+
+  renderFooter() {
+    
+    return (
+      <div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-          <div>
-            <label>Maximum Number of Nodes</label>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>{DEFAULT_MAX_VALUE.toString()}</span>
-              <span>{MAX_MAX_VALUE.toString()}</span>
-            </div>
-            <input type='range' style={{ minWidth: '15rem' }} min={DEFAULT_MAX_VALUE.toString()} max={MAX_MAX_VALUE.toString()} defaultValue={DEFAULT_MAX_VALUE.toString()} id={`rGraphSlider.${this.randomIdSegment}`}onChange={_onChange} />
-          </div>
+          {this.renderFilter()}
           <a className='button small secondary' onClick={this.handleDownload.bind(this)}><i className='fa fa-download' /> Download (.png)</a>
         </div>
       </div>
