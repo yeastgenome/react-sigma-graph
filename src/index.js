@@ -104,7 +104,7 @@ class ReactSigmaGraph extends React.Component {
 
   // the edges need by d3 to calc format
   getFormattedLinks() {
-    let nodes = this.getData().nodes;
+    let nodes = this.getNodes();
     let edges = this.getEdges();
     let nodesIdsObj = nodes.reduce( (ac, next, i) => {
       ac[next.id] = i;
