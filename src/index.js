@@ -301,7 +301,7 @@ class ReactSigmaGraph extends React.Component {
         let _checked = (d === this.state.currentFilter);
         let _onChange = e => this.setState({ currentFilter: d });
         return (
-          <label key={d}>
+          <label key={d} style={{ display: 'inline-block', marginRight: '1rem' }}>
             <input checked={_checked} onChange={_onChange} type='radio' value={d} />
             {d}
           </label>
