@@ -144,11 +144,11 @@ class ReactSigmaGraph extends React.Component {
     var maxNodes = this.state.currentMaxNodes || DEFAULT_MAX_VALUE;
     let nodes;
     if (this.state.currentFilter) {
-      nodes =  this.getData().nodes.filter(this.props.filters[this.state.currentFilter]);
+      nodes = this.getData().nodes.filter(this.props.filters[this.state.currentFilter]);
     } else {
       nodes = this.getData().nodes.slice(0, maxNodes);
     }
-    return nodes.slice(0, maxNodes).map( (d) => {
+    return nodes.map( (d) => {
       d.color = colorScale(d.category);
       d.label = d.name;
       d.size = d.direct ? 1 : 0.5;
@@ -263,7 +263,7 @@ class ReactSigmaGraph extends React.Component {
     dragListener.bind('dragend', (e) => {
       setTimeout(() => {
         this.canClick = true;
-      }, 50)
+      }, 50);
     });
     this.s.bind('clickNode', (e) => {
       this.handleNodeClick(e);
