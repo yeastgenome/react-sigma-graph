@@ -211,6 +211,14 @@ class ReactSigmaGraph extends React.Component {
     }
     let _nodes = this.getFormattedNodes();
     let _edges = this.getEdges();
+    if (this.props.ignoreFloaters) {
+      let allEdgeIds = new Map();
+      for(let e of _edges) {
+        allEdgeIds.set(e.source, true);
+        allEdgeIds.set(e.target, true);
+      }
+      _nodes = _nodes.filter(d => allEdgeIds.has(d.id));
+    }
     if (!_nodes.length) return;
     let _graph = {
       nodes: _nodes,
@@ -366,7 +374,7 @@ const TARGET_ID_PREFIX = 'j-sigma-target';
 const TRANSITION_DURATION = 1000;
 const DEFAULT_X = 0;
 const DEFAULT_Y = 0;
-const N_TICKS = 180;
+const N_TICKS = 350;
 const EDGE_COLOR = '#e2e2e2';
 const HIGHLIGHTED_EDGE_COLOR = '#808080';
 const SIZE_DEBOUNCE = 1000;
