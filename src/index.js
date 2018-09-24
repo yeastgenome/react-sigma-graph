@@ -235,6 +235,7 @@ class ReactSigmaGraph extends React.Component {
       settings: {
         animationsTime: TRANSITION_DURATION,
         edgeLabelSize: 'proportional',
+        enableCamera: false,
         labelThreshold: 100,
         minNodeSize: 7,
         maxNodeSize: 7,
@@ -269,6 +270,7 @@ class ReactSigmaGraph extends React.Component {
       this.canClick = false;
     });
     dragListener.bind('dragend', (e) => {
+
       setTimeout(() => {
         this.canClick = true;
       }, 50);
