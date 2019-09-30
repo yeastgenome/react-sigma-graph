@@ -150,7 +150,7 @@ class ReactSigmaGraph extends React.Component {
     });
     return filteredEdges.map( (d, i) => {
       d.id = `e${i}`;
-      d.color = this.props.edge_color || EDGE_COLOR;
+      d.color = this.props.edgeColor || EDGE_COLOR;
       d.size = 2;
       return d;
     });
@@ -276,8 +276,8 @@ class ReactSigmaGraph extends React.Component {
       var nodeId = e.data.node.id;
       var toKeep = this.s.graph.neighbors(nodeId);
       toKeep[nodeId] = e.data.node;
-      var highlighted_edge_color = this.props.highlighted_edge_color;
-      var edge_color = this.props.edge_color;
+      var highlighted_edge_color = this.props.highlightedEdgeColor;
+      var edge_color = this.props.edgeColor;
       this.s.graph.edges().forEach(function(e) {
         if (toKeep[e.source] && toKeep[e.target])
           e.color = highlighted_edge_color ||  HIGHLIGHTED_EDGE_COLOR;
