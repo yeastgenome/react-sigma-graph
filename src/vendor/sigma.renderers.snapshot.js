@@ -109,16 +109,15 @@ import sigma from 'sigma';
       var formattedMonth = ('0' + month).slice(-2);
       var date = tempDate.getDate();
       var formattedDate = ('0' + date).slice(-2);
-      // var _HeaderText = `SGD ${tempDate.getFullYear()}-${formattedMonth}-${formattedDate}`;
       var _HeaderText = params['title'] ? params['title']: `${tempDate.getFullYear()}-${formattedMonth}-${formattedDate}`;
-      ctx.font = '20px Arial';
+      ctx.font = '17px Arial';
       ctx.fillText(_HeaderText, merged.width - 200, 30);
     }
     //Download with legend
     if (params['legendData']) {
       var ctx = merged.getContext("2d");
-      ctx.font = '20px Arial';
-      var left = 30;
+      ctx.font = '17px Arial';
+      var left = 15;
       for (var i = 0; i < params.legendData.length; i++) {
         ctx.fillStyle = params.legendData[i].color;
         ctx.beginPath();
