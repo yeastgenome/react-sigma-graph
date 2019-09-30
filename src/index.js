@@ -59,7 +59,25 @@ class ReactSigmaGraph extends React.Component {
 
   handleDownload(e) {
     if (this.s) {
-      this.s.renderers[0].snapshot({ download: true });
+      var legendData = [];
+      let cScale = this.getColorScale();
+      cScale.domain().forEach((d, i) => {
+        let thisBg = cScale(d);
+        legendData.push({ 'color': thisBg, 'text': d })
+      });
+
+      if(this.props.showLegend && this.props.title){
+        this.s.renderers[0].snapshot({ download: true,legendData:legendData,title:this.props.title});
+      }
+      else if (this.props.showLegend) {
+        this.s.renderers[0].snapshot({ download: true,legendData:legendData});
+      }
+      else if (this.props.title) {
+        this.s.renderers[0].snapshot({ download: true,title:this.props.title});
+      }
+      else {
+        this.s.renderers[0].snapshot({ download: true });
+      }
     }
   }
 
@@ -95,7 +113,7 @@ class ReactSigmaGraph extends React.Component {
       let domain = keys.filter((x, i, a) => a.indexOf(x) == i);
       return d3.scale.category10().domain(domain);
     }
-    
+
   }
 
   getHeight() {
@@ -200,11 +218,11 @@ class ReactSigmaGraph extends React.Component {
     } else {
       if (!sigma.classes.graph.hasMethod('neighbors')) {
         sigma.classes.graph.addMethod('neighbors', function(nodeId) {
-        var k,
+          var k,
             neighbors = {},
             index = this.allNeighborsIndex[nodeId] || {};
-        for (k in index)
-          neighbors[k] = this.nodesIndex[k];
+          for (k in index)
+            neighbors[k] = this.nodesIndex[k];
           return neighbors;
         });
       }
@@ -336,7 +354,7 @@ class ReactSigmaGraph extends React.Component {
         </div>
         <input type='range' style={{ minWidth: '15rem' }} min={DEFAULT_MAX_VALUE.toString()} max={MAX_MAX_VALUE.toString()} defaultValue={DEFAULT_MAX_VALUE.toString()} id={`rGraphSlider.${this.randomIdSegment}`} onChange={_onChange} />
       </div>
-    ); 
+    );
   }
 
   renderFooter() {

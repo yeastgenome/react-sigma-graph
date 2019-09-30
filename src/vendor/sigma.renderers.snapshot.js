@@ -101,6 +101,36 @@ import sigma from 'sigma';
       doneContexts.push(context);
     });
 
+    //Download with title on left
+    if(params['title']){
+      var ctx = merged.getContext("2d");
+      var tempDate = new Date();
+      var month = tempDate.getMonth() + 1;
+      var formattedMonth = ('0' + month).slice(-2);
+      var date = tempDate.getDate();
+      var formattedDate = ('0' + date).slice(-2);
+      // var _HeaderText = `SGD ${tempDate.getFullYear()}-${formattedMonth}-${formattedDate}`;
+      var _HeaderText = params['title'] ? params['title']: `${tempDate.getFullYear()}-${formattedMonth}-${formattedDate}`;
+      ctx.font = '20px Arial';
+      ctx.fillText(_HeaderText, merged.width - 200, 30);
+    }
+    //Download with legend
+    if (params['legendData']) {
+      var ctx = merged.getContext("2d");
+      ctx.font = '20px Arial';
+      var left = 30;
+      for (var i = 0; i < params.legendData.length; i++) {
+        ctx.fillStyle = params.legendData[i].color;
+        ctx.beginPath();
+        ctx.arc(50, 30 + (i * 25), 10, 0, 2 * Math.PI);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#000";
+        ctx.fillText(params.legendData[i].text, left + 50, 30 + (i * 25) + 5);
+      }
+    }
+    //End
+
     var dataUrl = merged.toDataURL(TYPES[params.format || 'png']);
 
     if (params.download)
