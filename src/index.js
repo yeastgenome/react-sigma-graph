@@ -132,7 +132,7 @@ class ReactSigmaGraph extends React.Component {
     });
     return filteredEdges.map( (d, i) => {
       d.id = `e${i}`;
-      d.color = EDGE_COLOR;
+      d.color = this.props.edge_color || EDGE_COLOR;
       d.size = 2;
       return d;
     });
@@ -237,10 +237,11 @@ class ReactSigmaGraph extends React.Component {
         edgeLabelSize: 'proportional',
         enableCamera: false,
         labelThreshold: 100,
-        minNodeSize: 7,
-        maxNodeSize: 7,
-        minEdgeSize: 2,
-        maxEdgeSize: 2,
+        defaultLabelSize:this.props.labelSize || 14,
+        minNodeSize: this.props.nodeSize || 7,
+        maxNodeSize: this.props.nodeSize || 7,
+        minEdgeSize: this.props.edgeSize || 2,
+        maxEdgeSize: this.props.edgeSize || 2,
         labelThreshold: 0,
         sideMargin: 4,
         zoomingRatio: 1
@@ -257,11 +258,13 @@ class ReactSigmaGraph extends React.Component {
       var nodeId = e.data.node.id;
       var toKeep = this.s.graph.neighbors(nodeId);
       toKeep[nodeId] = e.data.node;
+      var highlighted_edge_color = this.props.highlighted_edge_color;
+      var edge_color = this.props.edge_color;
       this.s.graph.edges().forEach(function(e) {
         if (toKeep[e.source] && toKeep[e.target])
-          e.color = HIGHLIGHTED_EDGE_COLOR;
+          e.color = highlighted_edge_color ||  HIGHLIGHTED_EDGE_COLOR;
         else
-          e.color = EDGE_COLOR;;
+          e.color = edge_color || EDGE_COLOR;
       });
       this.s.refresh();
     });
