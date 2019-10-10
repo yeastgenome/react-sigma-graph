@@ -1,6 +1,6 @@
 {
   "name": "react-sigma-graph",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "license": "MIT",
   "description": "A react component to easily make sigma graph visualizations.",
   "repository": {
@@ -33,5 +33,11 @@
     "babel-preset-env": "^1.5.1",
     "uglifyjs-webpack-plugin": "^1.2.7",
     "webpack": "^2.6.1"
-  }
+  },
+  "contributors": [
+    {
+      "name": "Sagar Jha",
+      "email":"sagarjhaa@gmail.com"
+    }
+  ]
 }

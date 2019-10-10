@@ -59,7 +59,25 @@ class ReactSigmaGraph extends React.Component {
 
   handleDownload(e) {
     if (this.s) {
-      this.s.renderers[0].snapshot({ download: true });
+      var legendData = [];
+      let cScale = this.getColorScale();
+      cScale.domain().forEach((d, i) => {
+        let thisBg = cScale(d);
+        legendData.push({ 'color': thisBg, 'text': d })
+      });
+
+      if(this.props.showLegend && this.props.title){
+        this.s.renderers[0].snapshot({ download: true,legendData:legendData,title:this.props.title});
+      }
+      else if (this.props.showLegend) {
+        this.s.renderers[0].snapshot({ download: true,legendData:legendData});
+      }
+      else if (this.props.title) {
+        this.s.renderers[0].snapshot({ download: true,title:this.props.title});
+      }
+      else {
+        this.s.renderers[0].snapshot({ download: true });
+      }
     }
   }
 
@@ -95,7 +113,7 @@ class ReactSigmaGraph extends React.Component {
       let domain = keys.filter((x, i, a) => a.indexOf(x) == i);
       return d3.scale.category10().domain(domain);
     }
-    
+
   }
 
   getHeight() {
@@ -132,7 +150,7 @@ class ReactSigmaGraph extends React.Component {
     });
     return filteredEdges.map( (d, i) => {
       d.id = `e${i}`;
-      d.color = EDGE_COLOR;
+      d.color = this.props.edgeColor || EDGE_COLOR;
       d.size = 2;
       return d;
     });
@@ -200,11 +218,11 @@ class ReactSigmaGraph extends React.Component {
     } else {
       if (!sigma.classes.graph.hasMethod('neighbors')) {
         sigma.classes.graph.addMethod('neighbors', function(nodeId) {
-        var k,
+          var k,
             neighbors = {},
             index = this.allNeighborsIndex[nodeId] || {};
-        for (k in index)
-          neighbors[k] = this.nodesIndex[k];
+          for (k in index)
+            neighbors[k] = this.nodesIndex[k];
           return neighbors;
         });
       }
@@ -237,10 +255,11 @@ class ReactSigmaGraph extends React.Component {
         edgeLabelSize: 'proportional',
         enableCamera: false,
         labelThreshold: 100,
-        minNodeSize: 7,
-        maxNodeSize: 7,
-        minEdgeSize: 2,
-        maxEdgeSize: 2,
+        defaultLabelSize:this.props.labelSize || 14,
+        minNodeSize: this.props.nodeSize || 7,
+        maxNodeSize: this.props.nodeSize || 7,
+        minEdgeSize: this.props.edgeSize || 2,
+        maxEdgeSize: this.props.edgeSize || 2,
         labelThreshold: 0,
         sideMargin: 4,
         zoomingRatio: 1
@@ -257,11 +276,13 @@ class ReactSigmaGraph extends React.Component {
       var nodeId = e.data.node.id;
       var toKeep = this.s.graph.neighbors(nodeId);
       toKeep[nodeId] = e.data.node;
+      var highlighted_edge_color = this.props.highlightedEdgeColor;
+      var edge_color = this.props.edgeColor;
       this.s.graph.edges().forEach(function(e) {
         if (toKeep[e.source] && toKeep[e.target])
-          e.color = HIGHLIGHTED_EDGE_COLOR;
+          e.color = highlighted_edge_color ||  HIGHLIGHTED_EDGE_COLOR;
         else
-          e.color = EDGE_COLOR;;
+          e.color = edge_color || EDGE_COLOR;
       });
       this.s.refresh();
     });
@@ -333,7 +354,7 @@ class ReactSigmaGraph extends React.Component {
         </div>
         <input type='range' style={{ minWidth: '15rem' }} min={DEFAULT_MAX_VALUE.toString()} max={MAX_MAX_VALUE.toString()} defaultValue={DEFAULT_MAX_VALUE.toString()} id={`rGraphSlider.${this.randomIdSegment}`} onChange={_onChange} />
       </div>
-    ); 
+    );
   }
 
   renderFooter() {
